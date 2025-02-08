@@ -74,17 +74,20 @@ public class FireExtinguisherActivation implements Listener {
                     double y = direction.getY() * timer + 1.4;
                     double z = direction.getZ() * timer;
                     loc.add(x, y, z);
-                    if (fireI.getParticle().equalsIgnoreCase("cloud")) showParticle(loc, Particle.CLOUD, (int) (timer), (int) (timer / 4));
-                    else {
-                        Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(fireI.getR(), fireI.getG(), fireI.getB()), 100);
-                        //loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), (int) (timer), 0, (int) (timer/ 4), 0, dust);
-                        //loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), 0, loc.getZ(), (int) (timer), 0, 0, 0,
-                        //        new Particle.DustOptions(Color.fromRGB(255, 0, 0), 10));
-                        //loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), (int) (timer), (timer), (int) (timer/4), 0,
-                        //        new Particle.DustOptions(Color.fromRGB(0, 255, 0), 10));
-                        loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), (int) (timer), 0, 0,(int) (timer/4),
-                                dust);
-                    }
+
+                    assert fireI != null;
+                    if (fireI.getParticle() != null)
+                        if (fireI.getParticle().equalsIgnoreCase("cloud")) showParticle(loc, Particle.CLOUD, (int) (timer), (int) (timer / 4));
+                        else {
+                            Particle.DustOptions dust = new Particle.DustOptions(Color.fromRGB(fireI.getR(), fireI.getG(), fireI.getB()), 100);
+                            //loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), (int) (timer), 0, (int) (timer/ 4), 0, dust);
+                            //loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), 0, loc.getZ(), (int) (timer), 0, 0, 0,
+                            //        new Particle.DustOptions(Color.fromRGB(255, 0, 0), 10));
+                            //loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), (int) (timer), (timer), (int) (timer/4), 0,
+                            //        new Particle.DustOptions(Color.fromRGB(0, 255, 0), 10));
+                            loc.getWorld().spawnParticle(Particle.REDSTONE, loc.getX(), loc.getY(), loc.getZ(), (int) (timer), 0, 0,(int) (timer/4),
+                                    dust);
+                        }
 
                     // extinguishing the fire that is in the action range of the fire extinguisher at the "timer" tick
                     // ! the further the smoke from the extinguisher goes, the more its radius increases ! //
