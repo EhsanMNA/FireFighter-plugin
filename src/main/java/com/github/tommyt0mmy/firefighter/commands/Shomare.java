@@ -33,14 +33,14 @@ public class Shomare implements CommandExecutor {
                     return false;
                 }
                 if (message.length() > 1024) return false;
-                for (String ss : args) message.append(ss);
+                for (String ss : args) message.append(ss).append(" ");
                 for (Player p : Bukkit.getOnlinePlayers()){
                     if (p.hasPermission("firefighter.125.receive")){
                         p.sendMessage(FireFighter.colorize(FireFighter.getInstance().messages.getMessage("firechat_125").replace("<player>",player.getDisplayName())+ message));
                         p.playSound(p.getLocation(), notifSound,notifSoundV,notifSoundF);
                     }
                 }
-                MissionsHandler.delays.put(player.getUniqueId(),10);
+                MissionsHandler.delays.put(player.getUniqueId(),360);
             }
         }
         return false;
