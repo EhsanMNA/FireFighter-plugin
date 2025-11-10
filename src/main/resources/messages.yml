@@ -35,7 +35,17 @@ messages:
   firechat_125_empty: '&4&lFireFighter: &eYou can not send empty messages'
   firechat_125_delay: '&4&lFireFighter:&f Please wait <time> seconds to send a new request'
   firechat_125_send: '&4&lFireFighter:&f Your 125 request has sended, wait for firefighters'
-
+  mission_end_header: "--------------\nThe <location_id> fire has been turned off!"
+  mission_end_top_firefighters: "Top firefighters:"
+  mission_end_participation: "&6Participation: &e<participating>&6/&e<total> &6firefighters (&e<percentage>%&6) helped in the mission"
+  mission_end_top_entry: "&e<rank>. &6<name> &7- &e<score> points"
+  mission_end_no_participants: "&cNo firefighters participated in this mission"
+  mission_end_footer: "---------------"
+  picked_up: "&4&lFireFighter &aYou picked up a victim! Carry them to safety."
+  rescued: "&4&lFireFighter &aVictim rescued! <rescued>/<total> saved."
+  all_rescued: "&4&lFireFighter &aAll victims rescued!"
+  mission_end_requires_rescue: "&4&lFireFighter &cMission not over—rescue all victims!"
+  inside_area: "&4&lFireFighter &cYou must leave the fire area to rescue the victim!"
 
 #COMMANDS DESCRIPTIONS
 

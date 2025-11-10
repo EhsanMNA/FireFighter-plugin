@@ -65,6 +65,17 @@ public class Messages
             put("messages.firechat_125_empty", "&4&lFireFighter: &eYou can not send empty messages");
             put("messages.firechat_125_send", "&4&lFireFighter: &f Your 125 request has sent, wait for firefighters");
             put("messages.firechat_125_delay", "&4&lFireFighter:&f Please wait <time> seconds to send a new request");
+            put("messages.mission_end_header", "--------------\\nThe <location_id> fire has been turned off!");
+            put("messages.mission_end_top_firefighters", "Top firefighters:");
+            put("messages.mission_end_participation", "&6Participation: &e<participating>&6/&e<total> &6firefighters (&e<percentage>%&6) helped in the mission");
+            put("messages.mission_end_top_entry", "&e<rank>. &6<name> &7- &e<score> points");
+            put("messages.mission_end_no_participants", "&cNo firefighters participated in this mission");
+            put("messages.mission_end_footer", "---------------");
+            put("messages.picked_up", "&4&lFireFighter &aYou picked up a victim! Carry them to safety.");
+            put("messages.rescued", "&4&lFireFighter &aVictim rescued! <rescued>/<total> saved.");
+            put("messages.all_rescued", "&4&lFireFighter &aAll victims rescued!");
+            put("messages.mission_end_requires_rescue", "&4&lFireFighter &cMission not over—rescue all victims!");
+            put("messages.inside_area", "&4&lFireFighter &cYou must leave the fire area to rescue the victim!");
 
             //COMMANDS DESCRIPTIONS
 
@@ -245,7 +256,7 @@ public class Messages
     }
 
     public String getMessage(String messageName) {
-        return messagesMap.get("messages." + messageName);
+        return messagesMap.getOrDefault("messages." + messageName, "A null message");
     }
 
     public String formattedMessage(String color, String messageName) { //Automatically puts the prefix and the color to the message

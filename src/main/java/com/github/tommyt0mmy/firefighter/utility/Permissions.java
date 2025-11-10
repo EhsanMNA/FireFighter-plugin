@@ -12,7 +12,8 @@ public enum Permissions {
     START_MISSION("fireset.startmission"),
     SET_REWARDS("fireset.rewardset"),
     SET_WAND("fireset.setwand"),
-    ON_DUTY("onduty");
+    ON_DUTY("onduty"),
+    RESCUE_VICTIMS("firefighter.rescue");
 
     private String node;
 

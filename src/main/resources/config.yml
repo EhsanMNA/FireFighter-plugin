@@ -7,7 +7,23 @@ fireset: {}
 missions_interval: 3600
 allow_missions_interval: false
 fire_lasting_seconds: 300
+# Interval in ticks to spread new fires during a mission
+fire_spread_interval_ticks: 200  # Every 10 seconds
+
+# Number of new fires to add each spread interval
+fire_spread_count_per_interval: 5
+
+# Potion effects applied to players in fire areas (format: EFFECT:duration_seconds:amplifier)
+fire_area_effects:
+  - POISON:5:1
+  - NAUSEA:10:1
 missions: {}
+rescue_system:
+  enabled: true  # Toggle the feature
+  npcs_per_mission: 3  # Number of NPCs to spawn
+  npc_type: VILLAGER  # EntityType: VILLAGER, ZOMBIE, etc.
+  npc_name: "&cVictim"  # Visible name above NPC
+  fire_resistant: true  # Make NPCs immune to fire damage
 FireHoses:
   1:
     material: MOJANG_BANNER_PATTERN

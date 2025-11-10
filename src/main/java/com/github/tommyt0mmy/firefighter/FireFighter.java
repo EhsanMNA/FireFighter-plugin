@@ -1,16 +1,16 @@
 package com.github.tommyt0mmy.firefighter;
 
 import com.github.tommyt0mmy.firefighter.commands.*;
-import com.github.tommyt0mmy.firefighter.events.FireExtinguisherActivation;
-import com.github.tommyt0mmy.firefighter.events.FireFighterChatListener;
-import com.github.tommyt0mmy.firefighter.events.FiresetWand;
+import com.github.tommyt0mmy.firefighter.events.*;
 import com.github.tommyt0mmy.firefighter.model.FireFighterItem;
 import com.github.tommyt0mmy.firefighter.model.MissionManager;
 import com.github.tommyt0mmy.firefighter.model.MissionStorage;
+import com.github.tommyt0mmy.firefighter.model.RescueManager;
 import com.github.tommyt0mmy.firefighter.tabcompleters.FiresetTabCompleter;
 import com.github.tommyt0mmy.firefighter.tabcompleters.HelpTabCompleter;
 import com.github.tommyt0mmy.firefighter.utility.Configs;
 import com.github.tommyt0mmy.firefighter.utility.Messages;
+import com.github.tommyt0mmy.firefighter.utility.Permissions;
 import com.github.tommyt0mmy.firefighter.utility.XMaterial;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemFlag;
@@ -39,46 +39,34 @@ public class FireFighter extends JavaPlugin {
     public Logger console = getLogger();
     public Messages messages = null;
     public Configs configs = null;
+    public RescueManager rescueManager = new RescueManager();
+    public FireAreaEffects fireAreaEffects;
     public static List<FireFighterItem> fireHoses = new ArrayList<>();
 
-    public static FireFighter getInstance()
-    {
+    public static FireFighter getInstance() {
         return instance;
     }
 
     public void onEnable() {
-        //Licence
-        //Date date = new Date();
-        //if (date.getDate()>=14 || date.getDate()<12) {
-        //    console.info("Licence has been expired! disabling....");
-        //    try {getServer().getPluginManager().disablePlugin(Objects.requireNonNull(getServer().getPluginManager().getPlugin("MoameleJobs")));
-        //    }catch (Exception ignored){}
-        //    getServer().getPluginManager().disablePlugin(this);
-        //    return;
-        //}
-        //priority 1
         instance = this;
 
-        //priority 2
         configs = new Configs();
         messages = new Messages();
         nextMissionStart = System.currentTimeMillis() + ((configs.getConfig().getInt("missions_interval")) * 1000L);
 
-        //priority 3
+        fireAreaEffects = new FireAreaEffects();
+
         loadEvents();
         loadCommands();
         loadWand();
         loadFireHoses();
         loadShomareMobile();
 
-        //priority 4
         MissionManager.loadMissions(Objects.requireNonNull(getConfig().getConfigurationSection("missions")));
         MissionStorage.initialize(getConfig());
 
-        //priority 5
         @SuppressWarnings("unused")
         BukkitTask task = new MissionsHandler().runTaskTimer(this, 0, 20);
-
 
         console.info("FireFighter v" + version + " enabled successfully [Forked by EhsanMNA]");
     }
@@ -89,8 +77,8 @@ public class FireFighter extends JavaPlugin {
         Shomare.notifSoundF = (float) getConfig().getDouble("125Sound.pitch");
     }
 
-    public void onDisable()
-    {
+    public void onDisable() {
+        rescueManager.cleanup();
         console.info("FireFighter v" + version + " disabled successfully");
     }
 
@@ -98,6 +86,8 @@ public class FireFighter extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new FireExtinguisherActivation(), this);
         this.getServer().getPluginManager().registerEvents(new FiresetWand(), this);
         this.getServer().getPluginManager().registerEvents(new FireFighterChatListener(), this);
+        this.getServer().getPluginManager().registerEvents(new RescueEvents(), this);
+//        this.getServer().getPluginManager().registerEvents(new FireAreaEffects(), this); // New listener for effects in fire areas
     }
 
     private void loadCommands() {
@@ -110,38 +100,39 @@ public class FireFighter extends JavaPlugin {
         getCommand("fireset").setTabCompleter(new FiresetTabCompleter());
     }
 
-    public void loadFireHoses(){
-        for (String s : getConfig().getConfigurationSection("FireHoses").getKeys(false)){
+    public void loadFireHoses() {
+        for (String s : getConfig().getConfigurationSection("FireHoses").getKeys(false)) {
             ItemStack fireHose;
-            fireHose = XMaterial.valueOf(getConfig().getString("FireHoses."+s+".material")).parseItem();
+            fireHose = XMaterial.valueOf(getConfig().getString("FireHoses." + s + ".material")).parseItem();
             ItemMeta meta = fireHose.getItemMeta();
-            meta.setDisplayName(colorize(getConfig().getString("FireHoses."+s+".name")));
-            List<String> lore = colorize(getConfig().getStringList("FireHoses."+s+".lore"));
-            lore.add(0,messages.getMessage("fire_extinguisher"));
+            meta.setDisplayName(colorize(getConfig().getString("FireHoses." + s + ".name")));
+            List<String> lore = colorize(getConfig().getStringList("FireHoses." + s + ".lore"));
+            lore.add(0, messages.getMessage("fire_extinguisher"));
             lore.add(ChatColor.YELLOW + "" + ChatColor.UNDERLINE + messages.getMessage("hold_right_click"));
             meta.setLore(colorize(lore));
             meta.addItemFlags(ItemFlag.HIDE_DESTROYS);
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            try {meta.setCustomModelData(getConfig().getInt("FireHoses."+s+".customModelData"));
-            }catch (Exception ignored){}
+            try {
+                meta.setCustomModelData(getConfig().getInt("FireHoses." + s + ".customModelData"));
+            } catch (Exception ignored) {}
             fireHose.setItemMeta(meta);
-            FireFighterItem it = new FireFighterItem(s,fireHose,getConfig().getInt("FireHoses."+s+".usage"));
-            it.setDisplayName(colorize(getConfig().getString("FireHoses."+s+".name")));
-            it.setR(getConfig().getInt("FireHoses."+s+".Red"));
-            it.setG(getConfig().getInt("FireHoses."+s+".Green"));
-            it.setB(getConfig().getInt("FireHoses."+s+".Blue"));
-            it.setParticle(getConfig().getString("FireHoses."+s+".particle"));
+            FireFighterItem it = new FireFighterItem(s, fireHose, getConfig().getInt("FireHoses." + s + ".usage"));
+            it.setDisplayName(colorize(getConfig().getString("FireHoses." + s + ".name")));
+            it.setR(getConfig().getInt("FireHoses." + s + ".Red"));
+            it.setG(getConfig().getInt("FireHoses." + s + ".Green"));
+            it.setB(getConfig().getInt("FireHoses." + s + ".Blue"));
+            it.setParticle(getConfig().getString("FireHoses." + s + ".particle"));
             fireHoses.add(it);
         }
     }
 
-    public static String colorize(String string){
+    public static String colorize(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
-    public static List<String> colorize(List<String> list){
+    public static List<String> colorize(List<String> list) {
         List<String> newList = new ArrayList<>();
-        for(String string : list) newList.add(colorize(string));
+        for (String string : list) newList.add(colorize(string));
         return newList;
     }
 
@@ -151,11 +142,9 @@ public class FireFighter extends JavaPlugin {
         return items;
     }
 
-    public ItemStack loadWand(){
+    public ItemStack loadWand() {
         ItemStack wand = getConfig().getItemStack("fireset.wand");
         FiresetWand.wand = wand;
         return wand;
     }
-
-
 }
