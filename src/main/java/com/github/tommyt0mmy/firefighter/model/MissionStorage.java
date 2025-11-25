@@ -11,8 +11,8 @@ public class MissionStorage {
 
 
     public static void initialize(ConfigurationSection section){
-        MissionStorage.allow_missions_interval = section.getBoolean("allow_missions_interval");
-        MissionStorage.missions_interval = section.getInt("missions_interval");
-        MissionStorage.fire_lasting_seconds = section.getInt("fire_lasting_seconds");
+        MissionStorage.allow_missions_interval = section.getBoolean("allow_missions_interval", true);
+        MissionStorage.missions_interval = section.getInt("missions_interval", 100);
+        MissionStorage.fire_lasting_seconds = section.getInt("fire_lasting_seconds", 300);
     }
 }

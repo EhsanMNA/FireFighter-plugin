@@ -5,7 +5,9 @@ import com.github.tommyt0mmy.firefighter.model.Mission;
 import com.github.tommyt0mmy.firefighter.model.MissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,6 +47,11 @@ public class FireAreaEffects extends BukkitRunnable {
                     loc.getBlockX() >= minX && loc.getBlockX() <= maxX &&
                     loc.getBlockZ() >= minZ && loc.getBlockZ() <= maxZ &&
                     Math.abs(loc.getBlockY() - y) <= 10; // Vertical range
+
+            ItemStack item = player.getInventory().getHelmet();
+            if (item != null && item.getType() != Material.AIR){
+                if (FireFighter.helmet.isFireHelmet(item)) continue;
+            }
 
             if (inArea && !affectedPlayers.contains(player.getUniqueId())) {
                 applyEffects(player);

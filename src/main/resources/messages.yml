@@ -35,7 +35,7 @@ messages:
   firechat_125_empty: '&4&lFireFighter: &eYou can not send empty messages'
   firechat_125_delay: '&4&lFireFighter:&f Please wait <time> seconds to send a new request'
   firechat_125_send: '&4&lFireFighter:&f Your 125 request has sended, wait for firefighters'
-  mission_end_header: "--------------\nThe <location_id> fire has been turned off!"
+  mission_end_header: "--------------\nThe <location_id> fire has been turned off!  <time>"
   mission_end_top_firefighters: "Top firefighters:"
   mission_end_participation: "&6Participation: &e<participating>&6/&e<total> &6firefighters (&e<percentage>%&6) helped in the mission"
   mission_end_top_entry: "&e<rank>. &6<name> &7- &e<score> points"

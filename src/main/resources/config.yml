@@ -13,6 +13,13 @@ fire_spread_interval_ticks: 200  # Every 10 seconds
 # Number of new fires to add each spread interval
 fire_spread_count_per_interval: 5
 
+fire_effect_helmet:
+  material: STONE
+  name: "&cFireFighterHelmet"
+  lore:
+    - "&ePut this on your head when entering a fire area!"
+  customModelData: 0
+  usage: 1
 # Potion effects applied to players in fire areas (format: EFFECT:duration_seconds:amplifier)
 fire_area_effects:
   - POISON:5:1

@@ -40,6 +40,12 @@ public class FireTool implements CommandExecutor {
                 return true;
             }
 
+        if ("helmet".equalsIgnoreCase(args[0])){
+            inventory.addItem(FireFighter.helmet.getItem());
+            ActionBar.sendActionBar(p,FireFighter.colorize("&e&iGG :D"));
+            return true;
+        }
+
         p.sendMessage(FireFighter.colorize("&c&lNot found!"));
         return true;
     }

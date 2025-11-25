@@ -16,6 +16,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MissionsHandler extends BukkitRunnable {
@@ -276,7 +278,8 @@ public class MissionsHandler extends BukkitRunnable {
     }
 
     private void broadcastEndMessage(Mission mission) {
-        String header = FireFighterClass.messages.getMessage("mission_end_header").replace("<location_id>", mission.getId());
+        String header = FireFighterClass.messages.getMessage("mission_end_header").replace("<location_id>", mission.getId())
+                .replace("<time>", LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         String footer = FireFighterClass.messages.getMessage("mission_end_footer");
         String topHeader = FireFighterClass.messages.getMessage("mission_end_top_firefighters");
 
@@ -307,13 +310,13 @@ public class MissionsHandler extends BukkitRunnable {
                 .replace("<percentage>", String.format("%.1f", participationPercentage));
 
         // Sort contributions descending
-        List<Map.Entry<UUID, Integer>> sortedContributions = new ArrayList<>(FireFighterClass.PlayerContribution.entrySet());
+        List<Map.Entry<UUID, Double>> sortedContributions = new ArrayList<>(FireFighterClass.PlayerContribution.entrySet());
         sortedContributions.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
         // Build top 3
         StringBuilder topList = new StringBuilder();
         for (int i = 0; i < Math.min(3, sortedContributions.size()); i++) {
-            Map.Entry<UUID, Integer> entry = sortedContributions.get(i);
+            Map.Entry<UUID, Double> entry = sortedContributions.get(i);
             Player player = Bukkit.getPlayer(entry.getKey());
             String name = (player != null) ? player.getName() : "Unknown";
             topList.append(FireFighterClass.messages.getMessage("mission_end_top_entry")

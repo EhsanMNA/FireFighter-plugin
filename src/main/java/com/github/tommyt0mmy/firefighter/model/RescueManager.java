@@ -74,6 +74,7 @@ public class RescueManager {
             npc.setInvulnerable(plugin.getConfig().getBoolean("rescue_system.fire_resistant", true));
             npc.setAI(false);  // Static, no movement
             npc.setSilent(true);  // No sounds
+            npc.setGlowing(true);
 
             PersistentDataContainer data = npc.getPersistentDataContainer();
             data.set(key, PersistentDataType.BYTE, (byte) 1);
@@ -195,7 +196,7 @@ public class RescueManager {
         activeNPCs.remove(passenger.getUniqueId());
         rescuedCount++;
 
-        addRescueContribution(player, 15);
+        addRescueContribution(player, 30);
 
         String msg = plugin.messages.getMessage("rescued")
                 .replace("<rescued>", String.valueOf(rescuedCount))
@@ -224,7 +225,7 @@ public class RescueManager {
         totalNPCs = 0;
     }
 
-    private void addRescueContribution(Player player, int points) {
+    private void addRescueContribution(Player player, double points) {
         if (!plugin.startedMission || plugin.missionName.isEmpty()) {
             return;
         }
@@ -236,7 +237,7 @@ public class RescueManager {
 
         // Add contribution points
         if (plugin.PlayerContribution.containsKey(player.getUniqueId())) {
-            int currentPoints = plugin.PlayerContribution.get(player.getUniqueId());
+            double currentPoints = plugin.PlayerContribution.get(player.getUniqueId());
             plugin.PlayerContribution.put(player.getUniqueId(), currentPoints + points);
         } else {
             plugin.PlayerContribution.put(player.getUniqueId(), points);

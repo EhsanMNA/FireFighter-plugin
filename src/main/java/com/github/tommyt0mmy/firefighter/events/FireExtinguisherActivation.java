@@ -215,9 +215,9 @@ public class FireExtinguisherActivation implements Listener {
 
         //incrementing by one the player's contribution count or setting it to 1 if it's the first contribution
         if (FireFighterClass.PlayerContribution.containsKey(p.getUniqueId())) {
-            int tmp = FireFighterClass.PlayerContribution.get(p.getUniqueId()) + 1;
+            double tmp = FireFighterClass.PlayerContribution.get(p.getUniqueId()) + 0.2;
             FireFighterClass.PlayerContribution.put(p.getUniqueId(), tmp);
-        }else FireFighterClass.PlayerContribution.put(p.getUniqueId(), 1);
+        }else FireFighterClass.PlayerContribution.put(p.getUniqueId(), 0.2);
 
     }
 

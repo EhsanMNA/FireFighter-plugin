@@ -2,10 +2,7 @@ package com.github.tommyt0mmy.firefighter;
 
 import com.github.tommyt0mmy.firefighter.commands.*;
 import com.github.tommyt0mmy.firefighter.events.*;
-import com.github.tommyt0mmy.firefighter.model.FireFighterItem;
-import com.github.tommyt0mmy.firefighter.model.MissionManager;
-import com.github.tommyt0mmy.firefighter.model.MissionStorage;
-import com.github.tommyt0mmy.firefighter.model.RescueManager;
+import com.github.tommyt0mmy.firefighter.model.*;
 import com.github.tommyt0mmy.firefighter.tabcompleters.FiresetTabCompleter;
 import com.github.tommyt0mmy.firefighter.tabcompleters.HelpTabCompleter;
 import com.github.tommyt0mmy.firefighter.utility.Configs;
@@ -13,6 +10,7 @@ import com.github.tommyt0mmy.firefighter.utility.Messages;
 import com.github.tommyt0mmy.firefighter.utility.Permissions;
 import com.github.tommyt0mmy.firefighter.utility.XMaterial;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -32,7 +30,7 @@ public class FireFighter extends JavaPlugin {
     public boolean missionsIntervalState = false;
     public boolean programmedStart = false;
     public long nextMissionStart;
-    public HashMap<UUID, Integer> PlayerContribution = new HashMap<>();
+    public HashMap<UUID, Double> PlayerContribution = new HashMap<>();
     public String missionName = "";
     public HashMap<UUID, Location> fireset_first_position = new HashMap<>();
     public HashMap<UUID, Location> fireset_second_position = new HashMap<>();
@@ -42,6 +40,7 @@ public class FireFighter extends JavaPlugin {
     public RescueManager rescueManager = new RescueManager();
     public FireAreaEffects fireAreaEffects;
     public static List<FireFighterItem> fireHoses = new ArrayList<>();
+    public static FireFighterHelmet helmet;
 
     public static FireFighter getInstance() {
         return instance;
@@ -124,6 +123,18 @@ public class FireFighter extends JavaPlugin {
             it.setParticle(getConfig().getString("FireHoses." + s + ".particle"));
             fireHoses.add(it);
         }
+
+        // FF helmet
+        ConfigurationSection helmetSection = getConfig().getConfigurationSection("fire_effect_helmet");
+        ItemStack fireHelmet = XMaterial.valueOf(helmetSection.getString("material")).parseItem();
+        ItemMeta meta = fireHelmet.getItemMeta();
+        meta.setDisplayName(colorize(helmetSection.getString("name")));
+        List<String> lore = colorize(helmetSection.getStringList("lore"));
+        meta.setLore(colorize(lore));
+        try {meta.setCustomModelData(helmetSection.getInt("customModelData"));
+        } catch (Exception ignored) {}
+        fireHelmet.setItemMeta(meta);
+        helmet = new FireFighterHelmet(fireHelmet, helmetSection.getInt("usage"));
     }
 
     public static String colorize(String string) {
