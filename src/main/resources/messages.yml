@@ -4,6 +4,7 @@ messages:
   fire_extinguisher: 'Fire Extinguisher'
   only_players_command: 'Only players can execute this command'
   ingame_prefix: '[FireFighter]'
+  ingamechat_prefix: '&2[&c&nFireFighter&2]&r <name>&7: &f<text>'
   invalid_permissions: 'Invalid permissions!'
   page_not_found: 'Page not found!'
   hold_right_click: 'Hold Right Click'
@@ -46,6 +47,24 @@ messages:
   all_rescued: "&4&lFireFighter &aAll victims rescued!"
   mission_end_requires_rescue: "&4&lFireFighter &cMission not over—rescue all victims!"
   inside_area: "&4&lFireFighter &cYou must leave the fire area to rescue the victim!"
+
+  animal_mission_start: "&2&l----------------\n
+  &eA new report from the city! A &cCat &eis stuck somewhere!\n&7Report from: &f<place>\n&7Save time: &f<time> seconds\n&7Reward: &a<reward>$\n
+  &2&l-----------------"
+  animal_mission_success_player: "&aYou successfully saved the animal and received &e<reward>$&a!"
+  animal_mission_success_broadcast: "&aThe stuck animal at &e<place> &awas saved by &b<player>&a!"
+  animal_mission_fail: "&cThe animal at &e<place> &cwas not saved in time!"
+
+  points_your_points: "&aYour fire points: &e<points>"
+  points_other_points: "&a<player>'s fire points: &e<points>"
+  points_player_not_found: "&cPlayer not found!"
+  points_top_header: "&c&lTop Firefighters by Points (Page <page>/<total_pages>)"
+  points_top_entry: "&e<rank>. &a<name>&7: &e<points> points"
+  points_top_no_data: "&cNo points data available."
+  points_reset_success: "&aAll fire points have been reset!"
+  points_added_success: "&aAdded <amount> points to <player>!"
+  points_invalid_amount: "&cInvalid amount! Must be a positive integer."
+  points_no_permission: "&cYou don't have permission to do that!"
 
 #COMMANDS DESCRIPTIONS
 

@@ -42,7 +42,9 @@ public class ChatToggle implements CommandExecutor {
         }else {
             for (Player player : Bukkit.getOnlinePlayers()){
                 if (!player.hasPermission(Permissions.CHAT.getNode())) continue;
-                player.sendMessage(FireFighter.colorize("&f[&cFireFighterChat&f] "+p.getName()+"&7:" + Arrays.toString(args)));
+//                player.sendMessage(FireFighter.colorize("&f[&cFireFighterChat&f] "+p.getName()+"&7:" + Arrays.toString(args)));
+                player.sendMessage(FireFighter.colorize(FireFighter.getInstance().messages.getMessage("ingamechat_prefix")
+                        .replace("<name>",p.getName()).replace("<text>",Arrays.toString(args))));
                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,10,2);
             }
         }

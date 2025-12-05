@@ -29,12 +29,11 @@ public class Fireset implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender Sender, Command cmd, String label, String[] args) {
-        if (!(Sender instanceof Player)) {
+        if (!(Sender instanceof Player p)) {
             Sender.sendMessage(FireFighterClass.messages.formattedMessage("", "only_players_command"));
             return true;
         }
 
-        Player p = (Player) Sender;
         if (!p.hasPermission(Permissions.FIRESET.getNode())) {
             p.sendMessage(FireFighterClass.messages.formattedMessage("§c", "invalid_permissions"));
             return true;

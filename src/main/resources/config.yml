@@ -1,5 +1,18 @@
 prefix: '[FireFighter] '
+fire_effects:
+  smoke_enabled: true
+  smoke_particle_count: 3
+  smoke_particle_size: 0.5
+  smoke_particle_speed: 0.1
+  smoke_spread_horizontal: 0.3
+  smoke_spread_vertical: 0.5
+  smoke_frequency_ticks: 5  # How often to spawn smoke (in ticks)
+  smoke_chance: 0.8  # Chance to spawn smoke each time
 125Sound:
+  name: ENTITY_CAT_HISS
+  value: 10
+  pitch: 1
+StartSound:
   name: ENTITY_CAT_HISS
   value: 10
   pitch: 1
@@ -31,6 +44,33 @@ rescue_system:
   npc_type: VILLAGER  # EntityType: VILLAGER, ZOMBIE, etc.
   npc_name: "&cVictim"  # Visible name above NPC
   fire_resistant: true  # Make NPCs immune to fire damage
+animal_rescue:
+  enabled: true
+  interval_seconds: 1800   # every 30 minutes
+  duration_seconds: 300    # 5 minutes to save the animal
+  animal_type: CAT
+  reward_min: 100
+  reward_max: 500
+  reward_command: "eco give <player> <reward>"
+  locations:
+    park:
+      world: world
+      x: 150.5
+      y: 67.0
+      z: -230.5
+      place_name: "Central Park"
+    rooftop:
+      world: world
+      x: 320.5
+      y: 98.0
+      z: 100.5
+      place_name: "Downtown Rooftop"
+    market:
+      world: world
+      x: -50.5
+      y: 64.0
+      z: 400.5
+      place_name: "Old Market"
 FireHoses:
   1:
     material: MOJANG_BANNER_PATTERN

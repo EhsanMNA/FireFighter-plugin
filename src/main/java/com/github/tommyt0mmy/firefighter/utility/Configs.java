@@ -51,6 +51,10 @@ public class Configs {
             logError();
         }
 
+        configsConfiguration.set("points.per_contribution", 1.0);
+        configsConfiguration.set("animal_rescue.points_reward", 50);
+        configsConfiguration.set("points.page_size", 10);
+
         int fire_lasting_seconds = configsConfiguration.getInt("fire_lasting_seconds", -1);
         int missions_interval = configsConfiguration.getInt("missions_interval", -1);
         FireFighterClass.missionsIntervalState = configsConfiguration.getBoolean("allow_missions_interval", false);

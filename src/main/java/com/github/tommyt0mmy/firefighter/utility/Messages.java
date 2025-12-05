@@ -34,6 +34,7 @@ public class Messages
             put("messages.only_players_command", "Only players can execute this command");
             put("messages.fire_extinguisher", "Fire Extinguisher");
             put("messages.ingame_prefix", "[FireFighter]");
+            put("messages.ingamechat_prefix", "&2[&c&nFireFighter&2]&r <name>&7: &f<text>");
             put("messages.invalid_permissions", "Invalid permissions!");
             put("messages.page_not_found", "Page not found!");
             put("messages.hold_right_click", "Hold Right Click");
@@ -76,6 +77,22 @@ public class Messages
             put("messages.all_rescued", "&4&lFireFighter &aAll victims rescued!");
             put("messages.mission_end_requires_rescue", "&4&lFireFighter &cMission not over—rescue all victims!");
             put("messages.inside_area", "&4&lFireFighter &cYou must leave the fire area to rescue the victim!");
+
+            put("messages.animal_mission_start", "&eA new report from the city! A &cCat &eis stuck somewhere!\n&7Report from: &f<place>\n&7Save time: &f<time> seconds\n&7Reward: &a<reward>$");
+            put("messages.animal_mission_success_player", "&aYou successfully saved the animal and received &e<reward>$&a!");
+            put("messages.animal_mission_success_broadcast", "&aThe stuck animal at &e<place> &awas saved by &b<player>&a!");
+            put("messages.animal_mission_fail", "&cThe animal at &e<place> &cwas not saved in time!");
+
+            put("points_your_points", "&aYour fire points: &e<points>");
+            put("points_other_points", "&a<player>'s fire points: &e<points>");
+            put("points_player_not_found", "&cPlayer not found!");
+            put("points_top_header", "&c&lTop Firefighters by Points (Page <page>/<total_pages>)");
+            put("points_top_entry", "&e<rank>. &a<name>&7: &e<points> points");
+            put("points_top_no_data", "&cNo points data available.");
+            put("points_reset_success", "&aAll fire points have been reset!");
+            put("points_added_success", "&aAdded <amount> points to <player>!");
+            put("points_invalid_amount", "&cInvalid amount! Must be a positive integer.");
+            put("points_no_permission", "&cYou don't have permission to do that!");
 
             //COMMANDS DESCRIPTIONS
 

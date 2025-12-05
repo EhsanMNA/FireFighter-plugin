@@ -21,3 +21,6 @@
    shomare:
      aliases:
        - "125"
+   firepoints:
+     aliases:
+       - "fp"

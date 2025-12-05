@@ -4,6 +4,7 @@ import com.github.tommyt0mmy.firefighter.model.Mission;
 import com.github.tommyt0mmy.firefighter.model.MissionManager;
 import com.github.tommyt0mmy.firefighter.model.MissionStorage;
 import com.github.tommyt0mmy.firefighter.model.RescueManager;
+import com.github.tommyt0mmy.firefighter.utility.JalaliCalendar;
 import com.github.tommyt0mmy.firefighter.utility.Permissions;
 import com.github.tommyt0mmy.firefighter.utility.XMaterial;
 import com.github.tommyt0mmy.firefighter.utility.titles.ActionBar;
@@ -12,8 +13,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.LocalTime;
@@ -35,6 +34,10 @@ public class MissionsHandler extends BukkitRunnable {
     static Material fire = XMaterial.FIRE.parseMaterial();
     static int fireKeepTimer = 0;
     static int fireSpreadTimer = 0; // New timer for spreading fires
+
+    public static Sound notifSound = Sound.BLOCK_ANVIL_BREAK;
+    public static float notifSoundV = 10;
+    public static float notifSoundF = 1.0f;
 
     public static HashMap<UUID, Integer> delays = new HashMap<>();
 
@@ -58,10 +61,18 @@ public class MissionsHandler extends BukkitRunnable {
         int fire_lasting_ticks = MissionStorage.fire_lasting_seconds * 20;
         Random random = new Random();
         Mission mission = MissionManager.getMissions().get(random.nextInt(MissionManager.getMissions().size()));
+        if (FireFighterClass.missionName != null && !FireFighterClass.missionName.isEmpty())
+            mission = MissionManager.getMission(FireFighterClass.missionName);
+
 
         if (FireFighterClass.startedMission) {
             // Keeping the fire on
             fireKeepTimer++;
+
+            // Check if it's time to spawn smoke
+            int smokeFrequency = FireFighterClass.getConfig().getInt("fire_effects.smoke_frequency_ticks", 5);
+            boolean shouldSpawnSmoke = (fireKeepTimer % smokeFrequency) == 0;
+
             if ((fireKeepTimer % 5) == 0) {
                 if (fireKeepTimer >= fire_lasting_ticks / 100) {
                     // TURNING OFF THE MISSION
@@ -73,16 +84,31 @@ public class MissionsHandler extends BukkitRunnable {
                 else {
                     for (int i = 0; i < setOnFire.size(); i++) {
                         Block currBlock = setOnFire.get(i);
-                        if (currBlock.getType().equals(fire) && !currBlock.getType().equals(Material.AIR)) continue;
-                        if (random.nextInt(2) == 1) {
-                            setOnFire.remove(i);
-                            continue;
+
+                        // Check if fire is still burning
+                        if (!currBlock.getType().equals(fire)) {
+                            // Random chance to re-ignite
+                            if (random.nextInt(3) == 1) { // 33% chance
+                                currBlock.setType(fire);
+                            } else {
+                                setOnFire.remove(i);
+                                i--;
+                                continue;
+                            }
                         }
-                        currBlock.setType(fire);
-                        // Add smoke particles like campfire
-                        currBlock.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, currBlock.getLocation().add(0.5, 1, 0.5), 1, 0.2, 0.5, 0.2, 0.01);
+
+                        // Spawn enhanced smoke effects
+                        if (shouldSpawnSmoke) {
+                            spawnEnhancedSmoke(currBlock);
+
+                            // Also spawn fire particles
+                            if (FireFighterClass.getConfig().getBoolean("fire_effects.flame_particles", true)) {
+                                spawnFireParticles(currBlock);
+                            }
+                        }
                     }
                 }
+
             }
 
             // Spread fires periodically (configurable, e.g., every 10 seconds = 200 ticks)
@@ -93,6 +119,7 @@ public class MissionsHandler extends BukkitRunnable {
                 spreadFires(mission);
             }
         }
+
 
         if (System.currentTimeMillis() < FireFighterClass.nextMissionStart && !FireFighterClass.programmedStart) return;
         if (!FireFighterClass.missionsIntervalState && !FireFighterClass.programmedStart) return;
@@ -132,14 +159,18 @@ public class MissionsHandler extends BukkitRunnable {
 
         String title = ChatColor.translateAlternateColorCodes('&', FireFighterClass.messages.getMessage("startedmission_title")
                 .replaceAll("<mission_description>", mission.getDescription())
+                .replaceAll("<mission_name>", mission.getId())
                 .replaceAll("<coordinates>", getMediumCoord(mission.getId())));
         String subtitle = ChatColor.translateAlternateColorCodes('&', FireFighterClass.messages.getMessage("startedmission_subtitle")
                 .replaceAll("<mission_description>", mission.getDescription())
+                .replaceAll("<mission_name>", mission.getId())
                 .replaceAll("<coordinates>", getMediumCoord(mission.getId())));
         String hotBar = ChatColor.translateAlternateColorCodes('&', FireFighterClass.messages.getMessage("startedmission_hotbar")
+                .replaceAll("<mission_name>", mission.getId())
                 .replaceAll("<mission_description>", mission.getDescription())
                 .replaceAll("<coordinates>", getMediumCoord(mission.getId())));
         String chat = ChatColor.translateAlternateColorCodes('&', FireFighterClass.messages.getMessage("startedmission_chat")
+                .replaceAll("<mission_name>", mission.getId())
                 .replaceAll("<mission_description>", mission.getDescription())
                 .replaceAll("<coordinates>", getMediumCoord(mission.getId())));
 
@@ -248,8 +279,10 @@ public class MissionsHandler extends BukkitRunnable {
     private void Broadcast(World w, String message, String permission) {
         if (w == null) return;
         for (Player dest : w.getPlayers())
-            if (dest.hasPermission(permission))
+            if (dest.hasPermission(permission)){
                 dest.sendMessage(message);
+                dest.playSound(dest.getLocation(), notifSound,notifSoundV,notifSoundF);
+            }
     }
 
     private String getMediumCoord(String missionName) {
@@ -267,10 +300,19 @@ public class MissionsHandler extends BukkitRunnable {
         FireFighterClass.console.info("Mission ended");
         FireFighterClass.startedMission = false;
         FireFighterClass.missionName = "";
+
+        // turn of fire
+        for (Block block : setOnFire) block.setType(Material.AIR);
         setOnFire.clear();
 
         // Broadcast end message with top firefighters
         broadcastEndMessage(mission);
+
+        double multiplier = FireFighterClass.getConfig().getDouble("points.per_contribution", 1.0);
+        for (Map.Entry<UUID, Double> entry : FireFighterClass.PlayerContribution.entrySet()) {
+            int pointsToAdd = (int) Math.round(entry.getValue() * multiplier);
+            FireFighterClass.pointsManager.addPoints(entry.getKey(), pointsToAdd);
+        }
 
         rescueManager.cleanup();
 
@@ -278,8 +320,17 @@ public class MissionsHandler extends BukkitRunnable {
     }
 
     private void broadcastEndMessage(Mission mission) {
+        JalaliCalendar jalaliCalendar = new JalaliCalendar();
+
+        int year = jalaliCalendar.get(JalaliCalendar.YEAR);
+        int month = jalaliCalendar.get(JalaliCalendar.MONTH) + 1;
+        int day = jalaliCalendar.get(JalaliCalendar.DAY_OF_MONTH);
+
+        // Format as yyyy-mm-dd
+        String formattedDate = String.format("%04d-%02d-%02d", year, month, day);
+
         String header = FireFighterClass.messages.getMessage("mission_end_header").replace("<location_id>", mission.getId())
-                .replace("<time>", LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                .replace("<time>", formattedDate + ", " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
         String footer = FireFighterClass.messages.getMessage("mission_end_footer");
         String topHeader = FireFighterClass.messages.getMessage("mission_end_top_firefighters");
 
@@ -322,7 +373,7 @@ public class MissionsHandler extends BukkitRunnable {
             topList.append(FireFighterClass.messages.getMessage("mission_end_top_entry")
                             .replace("<rank>", String.valueOf(i + 1))
                             .replace("<name>", name)
-                            .replace("<score>", String.valueOf(entry.getValue())))
+                            .replace("<score>", String.format("%.1f", entry.getValue())))
                     .append("\n");
         }
 
@@ -342,6 +393,126 @@ public class MissionsHandler extends BukkitRunnable {
                     dest.sendMessage(FireFighter.colorize(footer));
                 }
             }
+        }
+    }
+
+    private void spawnEnhancedSmoke(Block fireBlock) {
+        if (!FireFighterClass.getConfig().getBoolean("fire_effects.smoke_enabled", true)) {
+            return;
+        }
+
+        Random random = new Random();
+
+        // Check chance to spawn smoke
+        if (random.nextDouble() > FireFighterClass.getConfig().getDouble("fire_effects.smoke_chance", 0.8)) {
+            return;
+        }
+
+        World world = fireBlock.getWorld();
+        Location smokeLocation = fireBlock.getLocation().add(0.5, 0.2, 0.5);
+
+        // Get configuration values
+        int particleCount = FireFighterClass.getConfig().getInt("fire_effects.smoke_particle_count", 3);
+        double particleSize = FireFighterClass.getConfig().getDouble("fire_effects.smoke_particle_size", 0.5);
+        double particleSpeed = FireFighterClass.getConfig().getDouble("fire_effects.smoke_particle_speed", 0.1);
+        double spreadHorizontal = FireFighterClass.getConfig().getDouble("fire_effects.smoke_spread_horizontal", 0.3);
+        double spreadVertical = FireFighterClass.getConfig().getDouble("fire_effects.smoke_spread_vertical", 0.5);
+
+        // Spawn multiple particle types for more realistic smoke
+        for (int i = 0; i < particleCount; i++) {
+            // Main smoke particles
+            world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
+                    smokeLocation.getX() + (random.nextDouble() - 0.5) * spreadHorizontal,
+                    smokeLocation.getY(),
+                    smokeLocation.getZ() + (random.nextDouble() - 0.5) * spreadHorizontal,
+                    0,  // Count (0 for extraData-based)
+                    spreadHorizontal, spreadVertical, spreadHorizontal, particleSpeed);
+
+            // Add some CLOUD particles for thicker smoke
+            if (random.nextDouble() < 0.3) {
+                world.spawnParticle(Particle.CLOUD,
+                        smokeLocation.getX() + (random.nextDouble() - 0.5) * spreadHorizontal * 0.5,
+                        smokeLocation.getY() + random.nextDouble() * 0.2,
+                        smokeLocation.getZ() + (random.nextDouble() - 0.5) * spreadHorizontal * 0.5,
+                        0,
+                        spreadHorizontal * 0.7, spreadVertical * 0.8, spreadHorizontal * 0.7,
+                        particleSpeed * 0.8);
+            }
+
+            // Add some white ash particles occasionally
+            if (random.nextDouble() < 0.1) {
+                world.spawnParticle(Particle.WHITE_ASH,
+                        smokeLocation.getX() + (random.nextDouble() - 0.5) * spreadHorizontal,
+                        smokeLocation.getY() + 0.1,
+                        smokeLocation.getZ() + (random.nextDouble() - 0.5) * spreadHorizontal,
+                        0,
+                        spreadHorizontal * 0.5, spreadVertical * 0.3, spreadHorizontal * 0.5,
+                        particleSpeed * 1.5);
+            }
+        }
+
+        // Add upward rising smoke effect
+        spawnRisingSmokeColumn(fireBlock);
+    }
+
+    private void spawnRisingSmokeColumn(Block fireBlock) {
+        if (!FireFighterClass.getConfig().getBoolean("fire_effects.smoke_column_enabled", true)) {
+            return;
+        }
+
+        World world = fireBlock.getWorld();
+        Location baseLocation = fireBlock.getLocation().add(0.5, 0.2, 0.5);
+        Random random = new Random();
+
+        int columnHeight = FireFighterClass.getConfig().getInt("fire_effects.smoke_column_height", 5);
+        int particlesPerLevel = FireFighterClass.getConfig().getInt("fire_effects.smoke_column_particles", 2);
+
+        for (int y = 0; y < columnHeight; y++) {
+            for (int i = 0; i < particlesPerLevel; i++) {
+                double offsetX = (random.nextDouble() - 0.5) * 0.2;
+                double offsetZ = (random.nextDouble() - 0.5) * 0.2;
+
+                // Smoke gets wider as it rises
+                double spread = 0.1 + (y * 0.05);
+
+                world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE,
+                        baseLocation.getX() + offsetX,
+                        baseLocation.getY() + y + (random.nextDouble() * 0.3),
+                        baseLocation.getZ() + offsetZ,
+                        0,
+                        spread, 0.1, spread,
+                        0.01);
+            }
+        }
+    }
+
+    private void spawnFireParticles(Block fireBlock) {
+        World world = fireBlock.getWorld();
+        Location particleLocation = fireBlock.getLocation().add(0.5, 0.2, 0.5);
+        Random random = new Random();
+
+        // Spawn flame particles
+        int flameCount = FireFighterClass.getConfig().getInt("fire_effects.flame_particle_count", 2);
+
+        for (int i = 0; i < flameCount; i++) {
+            world.spawnParticle(Particle.FLAME,
+                    particleLocation.getX() + (random.nextDouble() - 0.5) * 0.3,
+                    particleLocation.getY() + random.nextDouble() * 0.5,
+                    particleLocation.getZ() + (random.nextDouble() - 0.5) * 0.3,
+                    0,
+                    0.1, 0.1, 0.1,
+                    0.02);
+        }
+
+        // Spawn some lava particles for bigger fires
+        if (random.nextDouble() < 0.2) {
+            world.spawnParticle(Particle.DRIP_LAVA,
+                    particleLocation.getX(),
+                    particleLocation.getY() + 0.1,
+                    particleLocation.getZ(),
+                    0,
+                    0, 0.1, 0,
+                    0.1);
         }
     }
 }

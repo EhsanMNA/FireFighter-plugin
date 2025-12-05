@@ -3,6 +3,7 @@ package com.github.tommyt0mmy.firefighter;
 import com.github.tommyt0mmy.firefighter.commands.*;
 import com.github.tommyt0mmy.firefighter.events.*;
 import com.github.tommyt0mmy.firefighter.model.*;
+import com.github.tommyt0mmy.firefighter.tabcompleters.FirePointsTabCompleter;
 import com.github.tommyt0mmy.firefighter.tabcompleters.FiresetTabCompleter;
 import com.github.tommyt0mmy.firefighter.tabcompleters.HelpTabCompleter;
 import com.github.tommyt0mmy.firefighter.utility.Configs;
@@ -41,6 +42,8 @@ public class FireFighter extends JavaPlugin {
     public FireAreaEffects fireAreaEffects;
     public static List<FireFighterItem> fireHoses = new ArrayList<>();
     public static FireFighterHelmet helmet;
+    public AnimalRescueManager animalRescueManager;
+    public PointsManager pointsManager;
 
     public static FireFighter getInstance() {
         return instance;
@@ -67,6 +70,12 @@ public class FireFighter extends JavaPlugin {
         @SuppressWarnings("unused")
         BukkitTask task = new MissionsHandler().runTaskTimer(this, 0, 20);
 
+        pointsManager = new PointsManager(this);
+        animalRescueManager = new AnimalRescueManager();
+        new AnimalMissionsHandler().runTaskTimer(this, 0, 20);
+
+        rescueManager.cleanup();
+
         console.info("FireFighter v" + version + " enabled successfully [Forked by EhsanMNA]");
     }
 
@@ -74,10 +83,16 @@ public class FireFighter extends JavaPlugin {
         Shomare.notifSound = Sound.valueOf(getConfig().getString("125Sound.name"));
         Shomare.notifSoundV = getConfig().getInt("125Sound.value");
         Shomare.notifSoundF = (float) getConfig().getDouble("125Sound.pitch");
+
+        MissionsHandler.notifSound = Sound.valueOf(getConfig().getString("StartSound.name"));
+        MissionsHandler.notifSoundV = getConfig().getInt("StartSound.value");
+        MissionsHandler.notifSoundF = (float) getConfig().getDouble("StartSound.pitch");
     }
 
     public void onDisable() {
+        pointsManager.savePoints();
         rescueManager.cleanup();
+        if (animalRescueManager.isMissionActive()) animalRescueManager.endMission(false);
         console.info("FireFighter v" + version + " disabled successfully");
     }
 
@@ -86,6 +101,7 @@ public class FireFighter extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new FiresetWand(), this);
         this.getServer().getPluginManager().registerEvents(new FireFighterChatListener(), this);
         this.getServer().getPluginManager().registerEvents(new RescueEvents(), this);
+        this.getServer().getPluginManager().registerEvents(new AnimalRescueEvents(), this);
 //        this.getServer().getPluginManager().registerEvents(new FireAreaEffects(), this); // New listener for effects in fire areas
     }
 
@@ -97,6 +113,8 @@ public class FireFighter extends JavaPlugin {
         getCommand("firetool").setExecutor(new FireTool());
         getCommand("firefighter").setTabCompleter(new HelpTabCompleter());
         getCommand("fireset").setTabCompleter(new FiresetTabCompleter());
+        getCommand("firepoints").setExecutor(new FirePoints());
+        getCommand("firepoints").setTabCompleter(new FirePointsTabCompleter());
     }
 
     public void loadFireHoses() {

@@ -47,8 +47,7 @@
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
             <scope>compile</scope>
-        </dependency>
-    </dependencies>
+        </dependency></dependencies>
 
     <build>
         <plugins>
