@@ -11,6 +11,8 @@ public class Mission {
     int secondX;
     int firstZ;
     int secondZ;
+    int firstY;
+    int secondY;
 
     public Mission(String id) {
         this.id = id;
@@ -78,5 +80,21 @@ public class Mission {
 
     public void setSecondZ(int secondZ) {
         this.secondZ = secondZ;
+    }
+
+    public int getFirstY() {
+        return firstY;
+    }
+
+    public void setFirstY(int firstY) {
+        this.firstY = firstY;
+    }
+
+    public int getSecondY() {
+        return secondY;
+    }
+
+    public void setSecondY(int secondY) {
+        this.secondY = secondY;
     }
 }

@@ -45,6 +45,8 @@ public class MissionManager {
             mission.setFirstZ(section.getInt(missionId + ".first_position.z"));
             mission.setSecondX(section.getInt(missionId + ".second_position.x"));
             mission.setSecondZ(section.getInt(missionId + ".second_position.z"));
+            mission.setFirstY(section.getInt(missionId + ".second_position.y", 64));
+            mission.setSecondY(section.getInt(missionId + ".second_position.y", 92));
             addMission(mission);
         }
     }

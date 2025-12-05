@@ -48,6 +48,8 @@ public class RescueManager {
         int minX = Math.min(mission.getFirstX(), mission.getSecondX());
         int maxX = Math.max(mission.getFirstX(), mission.getSecondX());
         int minZ = Math.min(mission.getFirstZ(), mission.getSecondZ());
+        int maxY = Math.max(mission.getFirstY(), mission.getSecondY());
+        int minY = Math.min(mission.getFirstY(), mission.getSecondY());
         int maxZ = Math.max(mission.getFirstZ(), mission.getSecondZ());
 
         Random random = new Random();
@@ -64,7 +66,7 @@ public class RescueManager {
                 int z = minZ + random.nextInt(maxZ - minZ + 1);
 
                 // Method 1: Find highest safe block
-                loc = findSafeSpawnLocation(world, x, z);
+                loc = findSafeSpawnLocation(world, x, z, maxY, minY);
 
                 if (loc != null && isValidSpawnLocation(loc)) {
                     locationFound = true;
@@ -101,17 +103,17 @@ public class RescueManager {
                 new Object[]{activeNPCs.size(), attempts});
     }
 
-    private Location findSafeSpawnLocation(World world, int x, int z) {
+    private Location findSafeSpawnLocation(World world, int x, int z, int maxY, int minY) {
         // Start from world height and go down to find highest solid block
-        int y = world.getMaxHeight() - 1;
+        int y = maxY - 1;
 
-        while (y > world.getMinHeight()) {
+        while (y > minY) {
             Block block = world.getBlockAt(x, y, z);
             Block blockAbove = world.getBlockAt(x, y + 1, z);
             Block block2Above = world.getBlockAt(x, y + 2, z);
 
             // Check if this is a valid spawn location
-            boolean isSolidFloor = block.getType().isSolid() && !block.getType().toString().contains("LEAVES");
+            boolean isSolidFloor = block.getType().isSolid();
             boolean isPassableAbove = blockAbove.getType().isAir() || blockAbove.isPassable();
             boolean isPassable2Above = block2Above.getType().isAir() || block2Above.isPassable();
             boolean isNotHazardous = !isHazardousMaterial(blockAbove.getType()) &&
@@ -168,6 +170,14 @@ public class RescueManager {
 
         // Set persistence
         npc.setPersistent(true);
+
+        // 30% chance to make it a baby
+        if (new Random().nextDouble() < 0.3) {
+            if (npc instanceof Villager villager) {
+                villager.setBaby();
+                villager.setAgeLock(true); // Prevent growing up
+            }
+        }
 
         // Add NBT tag
         PersistentDataContainer data = npc.getPersistentDataContainer();
@@ -272,7 +282,7 @@ public class RescueManager {
         activeNPCs.remove(passenger.getUniqueId());
         rescuedCount++;
 
-        addRescueContribution(player, 30);
+        addRescueContribution(player, plugin.getConfig().getInt("rescue_system.rescue_points",30));
 
         String msg = plugin.messages.getMessage("rescued")
                 .replace("<rescued>", String.valueOf(rescuedCount))

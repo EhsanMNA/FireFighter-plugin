@@ -38,7 +38,7 @@ public class FireFighter extends JavaPlugin {
     public Logger console = getLogger();
     public Messages messages = null;
     public Configs configs = null;
-    public RescueManager rescueManager = new RescueManager();
+    public RescueManager rescueManager;
     public FireAreaEffects fireAreaEffects;
     public static List<FireFighterItem> fireHoses = new ArrayList<>();
     public static FireFighterHelmet helmet;
@@ -58,6 +58,9 @@ public class FireFighter extends JavaPlugin {
 
         fireAreaEffects = new FireAreaEffects();
 
+        rescueManager = new RescueManager();
+        animalRescueManager = new AnimalRescueManager();
+
         loadEvents();
         loadCommands();
         loadWand();
@@ -71,7 +74,6 @@ public class FireFighter extends JavaPlugin {
         BukkitTask task = new MissionsHandler().runTaskTimer(this, 0, 20);
 
         pointsManager = new PointsManager(this);
-        animalRescueManager = new AnimalRescueManager();
         new AnimalMissionsHandler().runTaskTimer(this, 0, 20);
 
         rescueManager.cleanup();

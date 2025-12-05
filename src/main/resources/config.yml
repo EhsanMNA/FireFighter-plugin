@@ -44,6 +44,7 @@ rescue_system:
   npc_type: VILLAGER  # EntityType: VILLAGER, ZOMBIE, etc.
   npc_name: "&cVictim"  # Visible name above NPC
   fire_resistant: true  # Make NPCs immune to fire damage
+  rescue_points: 30
 animal_rescue:
   enabled: true
   interval_seconds: 1800   # every 30 minutes

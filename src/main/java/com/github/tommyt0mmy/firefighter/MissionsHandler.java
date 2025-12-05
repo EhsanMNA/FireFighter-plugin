@@ -74,7 +74,7 @@ public class MissionsHandler extends BukkitRunnable {
             boolean shouldSpawnSmoke = (fireKeepTimer % smokeFrequency) == 0;
 
             if ((fireKeepTimer % 5) == 0) {
-                if (fireKeepTimer >= fire_lasting_ticks / 100) {
+                if (fireKeepTimer >= fire_lasting_ticks / 100 || setOnFire.size() < 20) {
                     // TURNING OFF THE MISSION
                     fireKeepTimer = 0;
                     Bukkit.getWorld(mission.getWorldName()).setGameRule(GameRule.DO_FIRE_TICK, true);
@@ -99,11 +99,11 @@ public class MissionsHandler extends BukkitRunnable {
 
                         // Spawn enhanced smoke effects
                         if (shouldSpawnSmoke) {
-                            spawnEnhancedSmoke(currBlock);
+                            if (random.nextInt(3) == 1) spawnEnhancedSmoke(currBlock);
 
                             // Also spawn fire particles
                             if (FireFighterClass.getConfig().getBoolean("fire_effects.flame_particles", true)) {
-                                spawnFireParticles(currBlock);
+                                if (random.nextInt(3) == 1) spawnFireParticles(currBlock);
                             }
                         }
                     }
@@ -133,7 +133,7 @@ public class MissionsHandler extends BukkitRunnable {
             }
         }
         if (!hasDutyPlayers) {
-            FireFighterClass.console.info("No players on duty, skipping mission start.");
+//            FireFighterClass.console.info("No players on duty, skipping mission start.");
             return;
         }
 
@@ -220,6 +220,8 @@ public class MissionsHandler extends BukkitRunnable {
         int maxX = Math.max(mission.getFirstX(), mission.getSecondX());
         int minZ = Math.min(mission.getFirstZ(), mission.getSecondZ());
         int maxZ = Math.max(mission.getFirstZ(), mission.getSecondZ());
+        int minY = Math.min(mission.getFirstZ(), mission.getSecondZ());
+        int maxY = Math.max(mission.getFirstZ(), mission.getSecondZ());
 
         for (int i = 0; i < spreadCount; i++) {
             int x = minX + random.nextInt(maxX - minX + 1);
@@ -236,6 +238,12 @@ public class MissionsHandler extends BukkitRunnable {
             if (currLocation.getBlock().getType().equals(Material.AIR)) continue;
 
             currLocation.add(0, 1, 0);
+
+            if (currLocation.getBlockX() >= minX && currLocation.getBlockX() <= maxX &&
+                    currLocation.getBlockZ() >= minZ && currLocation.getBlockZ() <= maxZ &&
+                    currLocation.getBlockY() >= minY && currLocation.getBlockY() <= maxY) continue;
+
+
             Block currBlock = currLocation.getBlock();
             if (currBlock.getType() != fire) {
                 currBlock.setType(fire);
@@ -366,10 +374,11 @@ public class MissionsHandler extends BukkitRunnable {
 
         // Build top 3
         StringBuilder topList = new StringBuilder();
-        for (int i = 0; i < Math.min(3, sortedContributions.size()); i++) {
+        for (int i = 0; i < Math.min(10, sortedContributions.size()); i++) {
             Map.Entry<UUID, Double> entry = sortedContributions.get(i);
             Player player = Bukkit.getPlayer(entry.getKey());
             String name = (player != null) ? player.getName() : "Unknown";
+            if (!player.hasPermission(Permissions.ON_DUTY.getNode())) continue;
             topList.append(FireFighterClass.messages.getMessage("mission_end_top_entry")
                             .replace("<rank>", String.valueOf(i + 1))
                             .replace("<name>", name)
@@ -429,7 +438,7 @@ public class MissionsHandler extends BukkitRunnable {
                     spreadHorizontal, spreadVertical, spreadHorizontal, particleSpeed);
 
             // Add some CLOUD particles for thicker smoke
-            if (random.nextDouble() < 0.3) {
+            if (random.nextDouble() < 0.1) {
                 world.spawnParticle(Particle.CLOUD,
                         smokeLocation.getX() + (random.nextDouble() - 0.5) * spreadHorizontal * 0.5,
                         smokeLocation.getY() + random.nextDouble() * 0.2,

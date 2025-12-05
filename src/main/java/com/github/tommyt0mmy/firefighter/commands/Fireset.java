@@ -178,6 +178,8 @@ public class Fireset implements CommandExecutor {
                         //checks if the area is set
                         FireFighterClass.configs.set("missions." + args[1] + ".first_position.x", FireFighterClass.fireset_first_position.get(p.getUniqueId()).getBlockX());
                         FireFighterClass.configs.set("missions." + args[1] + ".first_position.z", FireFighterClass.fireset_first_position.get(p.getUniqueId()).getBlockZ());
+                        FireFighterClass.configs.set("missions." + args[1] + ".first_position.y", FireFighterClass.fireset_first_position.get(p.getUniqueId()).getBlockY());
+                        FireFighterClass.configs.set("missions." + args[1] + ".second_position.y", FireFighterClass.fireset_second_position.get(p.getUniqueId()).getBlockY());
                         FireFighterClass.configs.set("missions." + args[1] + ".second_position.x", FireFighterClass.fireset_second_position.get(p.getUniqueId()).getBlockX());
                         FireFighterClass.configs.set("missions." + args[1] + ".second_position.z", FireFighterClass.fireset_second_position.get(p.getUniqueId()).getBlockZ());
                         FireFighterClass.configs.set("missions." + args[1] + ".altitude", Math.min((FireFighterClass.fireset_first_position.get(p.getUniqueId()).getBlockY()), (FireFighterClass.fireset_second_position.get(p.getUniqueId()).getBlockY())));

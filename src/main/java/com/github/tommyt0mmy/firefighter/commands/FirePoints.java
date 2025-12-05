@@ -21,12 +21,10 @@ public class FirePoints implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(plugin.messages.formattedMessage("&c", "only_players_command"));
             return true;
         }
-
-        Player player = (Player) sender;
 
         if (args.length == 0) {
             sendUsage(player);
@@ -55,8 +53,8 @@ public class FirePoints implements CommandExecutor {
     }
 
     private void sendUsage(Player player) {
-        player.sendMessage(colorize(plugin.messages.formattedMessage("&c", "usage_firepoints")));
-        // Assume added to messages: "usage_firepoints" = "/firepoints <toppoints|points|resetpoints|addpoints>"
+        player.sendMessage(colorize(plugin.messages.getMessage("usage_firepoints")));
+        // "usage_firepoints" = "/firepoints <toppoints|points|resetpoints|addpoints>"
     }
 
     private void handleTopPoints(Player player, String[] args) {

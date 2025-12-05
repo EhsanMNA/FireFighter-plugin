@@ -83,16 +83,17 @@ public class Messages
             put("messages.animal_mission_success_broadcast", "&aThe stuck animal at &e<place> &awas saved by &b<player>&a!");
             put("messages.animal_mission_fail", "&cThe animal at &e<place> &cwas not saved in time!");
 
-            put("points_your_points", "&aYour fire points: &e<points>");
-            put("points_other_points", "&a<player>'s fire points: &e<points>");
-            put("points_player_not_found", "&cPlayer not found!");
-            put("points_top_header", "&c&lTop Firefighters by Points (Page <page>/<total_pages>)");
-            put("points_top_entry", "&e<rank>. &a<name>&7: &e<points> points");
-            put("points_top_no_data", "&cNo points data available.");
-            put("points_reset_success", "&aAll fire points have been reset!");
-            put("points_added_success", "&aAdded <amount> points to <player>!");
-            put("points_invalid_amount", "&cInvalid amount! Must be a positive integer.");
-            put("points_no_permission", "&cYou don't have permission to do that!");
+            put("messages.points_your_points", "&aYour fire points: &e<points>");
+            put("messages.points_other_points", "&a<player>'s fire points: &e<points>");
+            put("messages.points_player_not_found", "&cPlayer not found!");
+            put("messages.points_top_header", "&c&lTop Firefighters by Points (Page <page>/<total_pages>)");
+            put("messages.points_top_entry", "&e<rank>. &a<name>&7: &e<points> points");
+            put("messages.points_top_no_data", "&cNo points data available.");
+            put("messages.points_reset_success", "&aAll fire points have been reset!");
+            put("messages.points_added_success", "&aAdded <amount> points to <player>!");
+            put("messages.points_invalid_amount", "&cInvalid amount! Must be a positive integer.");
+            put("messages.points_no_permission", "&cYou don't have permission to do that!");
+            put("messages.usage_firepoints", "/firepoints <toppoints|points|resetpoints|addpoints>");
 
             //COMMANDS DESCRIPTIONS
 

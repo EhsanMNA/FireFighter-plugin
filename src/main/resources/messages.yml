@@ -65,6 +65,7 @@ messages:
   points_added_success: "&aAdded <amount> points to <player>!"
   points_invalid_amount: "&cInvalid amount! Must be a positive integer."
   points_no_permission: "&cYou don't have permission to do that!"
+  usage_firepoints: "/firepoints <toppoints|points|resetpoints|addpoints>"
 
 #COMMANDS DESCRIPTIONS
 
