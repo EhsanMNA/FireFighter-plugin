@@ -51,28 +51,33 @@ public class Configs {
             logError();
         }
 
-        configsConfiguration.set("points.per_contribution", 1.0);
-        configsConfiguration.set("animal_rescue.points_reward", 50);
-        configsConfiguration.set("points.page_size", 10);
+        try {
+            configsConfiguration.set("points.per_contribution", 1.0);
+            configsConfiguration.set("animal_rescue.points_reward", 50);
+            configsConfiguration.set("points.page_size", 10);
 
-        int fire_lasting_seconds = configsConfiguration.getInt("fire_lasting_seconds", -1);
-        int missions_interval = configsConfiguration.getInt("missions_interval", -1);
-        FireFighterClass.missionsIntervalState = configsConfiguration.getBoolean("allow_missions_interval", false);
-        if (fire_lasting_seconds == -1) {
-            fire_lasting_seconds = 300;
-            configsConfiguration.set("fire_lasting_seconds", fire_lasting_seconds);
+            int fire_lasting_seconds = configsConfiguration.getInt("fire_lasting_seconds", -1);
+            int missions_interval = configsConfiguration.getInt("missions_interval", -1);
+            FireFighterClass.missionsIntervalState = configsConfiguration.getBoolean("allow_missions_interval", false);
+            if (fire_lasting_seconds == -1) {
+                fire_lasting_seconds = 300;
+                configsConfiguration.set("fire_lasting_seconds", fire_lasting_seconds);
+            }
+            if (missions_interval == -1) {
+                missions_interval = 3600;
+                configsConfiguration.set("missions_interval", missions_interval);
+            }
+            if (configsConfiguration.getItemStack("fireset.wand", null) == null) {
+                ItemStack wand = new ItemStack(Material.STICK);
+                ItemMeta wandMeta = wand.getItemMeta();
+                wandMeta.setDisplayName(FireFighterClass.messages.formattedMessage(ChatColor.YELLOW.toString(), "fireset_wand"));
+                wand.setItemMeta(wandMeta);
+                configsConfiguration.set("fireset.wand", wand);
+            }
+        }catch (Exception e){
+            FireFighterClass.console.severe("Couldn't load config.yml properly! It seems some configs are missing!");
         }
-        if (missions_interval == -1) {
-            missions_interval = 3600;
-            configsConfiguration.set("missions_interval", missions_interval);
-        }
-        if (configsConfiguration.getItemStack("fireset.wand", null) == null) {
-            ItemStack wand = new ItemStack(Material.STICK);
-            ItemMeta wandMeta = wand.getItemMeta();
-            wandMeta.setDisplayName(FireFighterClass.messages.formattedMessage(ChatColor.YELLOW.toString(), "fireset_wand"));
-            wand.setItemMeta(wandMeta);
-            configsConfiguration.set("fireset.wand", wand);
-        }
+
 
         try {
             //SAVING

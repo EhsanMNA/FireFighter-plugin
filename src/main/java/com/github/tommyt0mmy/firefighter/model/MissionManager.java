@@ -1,5 +1,7 @@
 package com.github.tommyt0mmy.firefighter.model;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
@@ -41,12 +43,15 @@ public class MissionManager {
             mission.setDescription(section.getString(missionId + ".description"));
             mission.setWorldName(section.getString(missionId + ".world"));
             mission.setAltitude(section.getInt(missionId + ".altitude"));
-            mission.setFirstX(section.getInt(missionId + ".first_position.x"));
-            mission.setFirstZ(section.getInt(missionId + ".first_position.z"));
-            mission.setSecondX(section.getInt(missionId + ".second_position.x"));
-            mission.setSecondZ(section.getInt(missionId + ".second_position.z"));
-            mission.setFirstY(section.getInt(missionId + ".second_position.y", 64));
-            mission.setSecondY(section.getInt(missionId + ".second_position.y", 92));
+            mission.setRegion(new Region(missionId,
+                    new Location(Bukkit.getWorld(section.getString(missionId + ".world")),
+                            section.getInt(missionId + ".first_position.x"),
+                            section.getInt(missionId + ".first_position.y"),
+                            section.getInt(missionId + ".first_position.z")),
+                    new Location(Bukkit.getWorld(section.getString(missionId + ".world")),
+                            section.getInt(missionId + ".second_position.x"),
+                            section.getInt(missionId + ".second_position.y"),
+                            section.getInt(missionId + ".second_position.z"))));
             addMission(mission);
         }
     }

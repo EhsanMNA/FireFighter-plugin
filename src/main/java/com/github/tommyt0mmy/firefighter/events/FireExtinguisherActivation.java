@@ -189,29 +189,27 @@ public class FireExtinguisherActivation implements Listener {
     }
 
     private void increaseContribution(Player p, Location fireLocation) {
-        if (!FireFighterClass.startedMission || FireFighterClass.missionName.equals(""))
-        { //checks if a mission is started, if not the player will not contribute on a mission
-            return;
-        }
+        if (!FireFighterClass.startedMission || FireFighterClass.missionName.equals("")) return;
+
         //getting the mission's location (two opposite points of the rectangular selection, missionPos1 and missionPos2)
         String missionPath = "missions." + FireFighterClass.missionName;
-        World missionWorld = FireFighterClass.getServer().getWorld((String) FireFighterClass.getConfig().get(missionPath + ".world"));
-        int minX = Math.min(FireFighterClass.getConfig().getInt(missionPath + ".first_position.x"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.x"));
-        int maxX = Math.max(FireFighterClass.getConfig().getInt(missionPath + ".first_position.x"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.x"));
-        int minZ = Math.min(FireFighterClass.getConfig().getInt(missionPath + ".first_position.z"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.z"));
-        int maxZ = Math.max(FireFighterClass.getConfig().getInt(missionPath + ".first_position.z"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.z"));
-        int currX = fireLocation.getBlockX();
-        int currZ = fireLocation.getBlockZ();
-
-        //checking if the fire extinguished is inside the mission's area
-        //if the world isn't the same
-        if (!fireLocation.getWorld().equals(missionWorld)) return;
-
-        //x position out of range
-        if (currX > maxX || currX < minX) return;
-
-        //z position out of range
-        if (currZ > maxZ || currZ < minZ) return;
+//        World missionWorld = FireFighterClass.getServer().getWorld((String) FireFighterClass.getConfig().get(missionPath + ".world"));
+//        int minX = Math.min(FireFighterClass.getConfig().getInt(missionPath + ".first_position.x"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.x"));
+//        int maxX = Math.max(FireFighterClass.getConfig().getInt(missionPath + ".first_position.x"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.x"));
+//        int minZ = Math.min(FireFighterClass.getConfig().getInt(missionPath + ".first_position.z"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.z"));
+//        int maxZ = Math.max(FireFighterClass.getConfig().getInt(missionPath + ".first_position.z"), FireFighterClass.getConfig().getInt(missionPath + ".second_position.z"));
+//        int currX = fireLocation.getBlockX();
+//        int currZ = fireLocation.getBlockZ();
+//
+//        //checking if the fire extinguished is inside the mission's area
+//        //if the world isn't the same
+//        if (!fireLocation.getWorld().equals(missionWorld)) return;
+//
+//        //x position out of range
+//        if (currX > maxX || currX < minX) return;
+//
+//        //z position out of range
+//        if (currZ > maxZ || currZ < minZ) return;
 
         //incrementing by one the player's contribution count or setting it to 1 if it's the first contribution
         if (FireFighterClass.PlayerContribution.containsKey(p.getUniqueId())) {

@@ -20,11 +20,11 @@ fireset: {}
 missions_interval: 3600
 allow_missions_interval: false
 fire_lasting_seconds: 300
-# Interval in ticks to spread new fires during a mission
-fire_spread_interval_ticks: 200  # Every 10 seconds
+# Interval in seconds to spread new fires during a mission
+fire_spread_interval_ticks: 3
 
 # Number of new fires to add each spread interval
-fire_spread_count_per_interval: 5
+fire_spread_count_per_interval: 15
 
 fire_effect_helmet:
   material: STONE

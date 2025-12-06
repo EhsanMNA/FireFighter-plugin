@@ -45,29 +45,31 @@ public class RescueManager {
         plugin.getLogger().log(Level.INFO, "Starting rescue for mission {0}, spawning {1} NPCs",
                 new Object[]{mission.getId(), totalNPCs});
 
-        int minX = Math.min(mission.getFirstX(), mission.getSecondX());
-        int maxX = Math.max(mission.getFirstX(), mission.getSecondX());
-        int minZ = Math.min(mission.getFirstZ(), mission.getSecondZ());
-        int maxY = Math.max(mission.getFirstY(), mission.getSecondY());
-        int minY = Math.min(mission.getFirstY(), mission.getSecondY());
-        int maxZ = Math.max(mission.getFirstZ(), mission.getSecondZ());
+        int minX = mission.getRegion().getMinX();
+        int maxX = mission.getRegion().getMaxX();
+        int minZ = mission.getRegion().getMinZ();
+        int maxY = mission.getRegion().getMaxY();
+        int minY = mission.getRegion().getMinY();
+        int maxZ = mission.getRegion().getMaxZ();
 
         Random random = new Random();
         int attempts = 0;
-        int maxAttempts = totalNPCs * 10; // Try up to 10 times per NPC
+        int maxAttempts = totalNPCs * 100; // Try up to 10 times per NPC
 
         for (int i = 0; i < totalNPCs; i++) {
             Location loc = null;
             boolean locationFound = false;
 
             // Try to find a valid location
-            for (int attempt = 0; attempt < 10 && !locationFound; attempt++) {
+            for (int attempt = 0; attempt < 100 && !locationFound; attempt++) {
                 int x = minX + random.nextInt(maxX - minX + 1);
                 int z = minZ + random.nextInt(maxZ - minZ + 1);
 
                 // Method 1: Find highest safe block
                 loc = findSafeSpawnLocation(world, x, z, maxY, minY);
 
+                if (!isValidSpawnLocation(loc))
+                    plugin.getLogger().log(Level.WARNING, "Location is not valid!");
                 if (loc != null && isValidSpawnLocation(loc)) {
                     locationFound = true;
                 }
@@ -105,7 +107,7 @@ public class RescueManager {
 
     private Location findSafeSpawnLocation(World world, int x, int z, int maxY, int minY) {
         // Start from world height and go down to find highest solid block
-        int y = maxY - 1;
+        int y = maxY;
 
         while (y > minY) {
             Block block = world.getBlockAt(x, y, z);
@@ -260,14 +262,13 @@ public class RescueManager {
         World missionWorld = Bukkit.getWorld(plugin.getConfig().getString(missionPath + ".world"));
         if (missionWorld == null) return;
 
-        int minX = Math.min(plugin.getConfig().getInt(missionPath + ".first_position.x"),
-                plugin.getConfig().getInt(missionPath + ".second_position.x"));
-        int maxX = Math.max(plugin.getConfig().getInt(missionPath + ".first_position.x"),
-                plugin.getConfig().getInt(missionPath + ".second_position.x"));
-        int minZ = Math.min(plugin.getConfig().getInt(missionPath + ".first_position.z"),
-                plugin.getConfig().getInt(missionPath + ".second_position.z"));
-        int maxZ = Math.max(plugin.getConfig().getInt(missionPath + ".first_position.z"),
-                plugin.getConfig().getInt(missionPath + ".second_position.z"));
+        Mission mission = MissionManager.getMission(missionName);
+
+        assert mission != null;
+        int minX = mission.getRegion().getMinX();
+        int maxX = mission.getRegion().getMaxX();
+        int minZ = mission.getRegion().getMinZ();
+        int maxZ = mission.getRegion().getMaxZ();
 
         Location playerLoc = player.getLocation();
         if (playerLoc.getWorld().equals(missionWorld) &&

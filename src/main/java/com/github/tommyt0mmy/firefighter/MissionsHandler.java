@@ -73,50 +73,51 @@ public class MissionsHandler extends BukkitRunnable {
             int smokeFrequency = FireFighterClass.getConfig().getInt("fire_effects.smoke_frequency_ticks", 5);
             boolean shouldSpawnSmoke = (fireKeepTimer % smokeFrequency) == 0;
 
-            if ((fireKeepTimer % 5) == 0) {
-                if (fireKeepTimer >= fire_lasting_ticks / 100 || setOnFire.size() < 20) {
-                    // TURNING OFF THE MISSION
-                    fireKeepTimer = 0;
-                    Bukkit.getWorld(mission.getWorldName()).setGameRule(GameRule.DO_FIRE_TICK, true);
-                    turnOffInstructions(mission); // Pass mission for end message
-                    return;
-                }
-                else {
-                    for (int i = 0; i < setOnFire.size(); i++) {
-                        Block currBlock = setOnFire.get(i);
+            if (fireKeepTimer > 20){
+                if ((fireKeepTimer % 5) == 0) {
+                    if (fireKeepTimer >= fire_lasting_ticks / 100 || setOnFire.size() < mission.getRegion().getLength()) {
+                        // TURNING OFF THE MISSION
+                        fireKeepTimer = 0;
+                        Bukkit.getWorld(mission.getWorldName()).setGameRule(GameRule.DO_FIRE_TICK, true);
+                        turnOffInstructions(mission); // Pass mission for end message
+                        return;
+                    }
+                    else {
+                        for (int i = 0; i < setOnFire.size(); i++) {
+                            Block currBlock = setOnFire.get(i);
 
-                        // Check if fire is still burning
-                        if (!currBlock.getType().equals(fire)) {
-                            // Random chance to re-ignite
-                            if (random.nextInt(3) == 1) { // 33% chance
-                                currBlock.setType(fire);
-                            } else {
-                                setOnFire.remove(i);
-                                i--;
-                                continue;
+                            // Check if fire is still burning
+                            if (!currBlock.getType().equals(fire)) {
+                                // Random chance to re-ignite
+                                if (random.nextInt(3) == 1) { // 33% chance
+                                    currBlock.setType(fire);
+                                } else {
+                                    setOnFire.remove(i);
+                                    i--;
+                                    continue;
+                                }
                             }
-                        }
 
-                        // Spawn enhanced smoke effects
-                        if (shouldSpawnSmoke) {
-                            if (random.nextInt(3) == 1) spawnEnhancedSmoke(currBlock);
+                            // Spawn enhanced smoke effects
+                            if (shouldSpawnSmoke) {
+                                if (random.nextInt(3) == 1) spawnEnhancedSmoke(currBlock);
 
-                            // Also spawn fire particles
-                            if (FireFighterClass.getConfig().getBoolean("fire_effects.flame_particles", true)) {
-                                if (random.nextInt(3) == 1) spawnFireParticles(currBlock);
+                                // Also spawn fire particles
+                                if (FireFighterClass.getConfig().getBoolean("fire_effects.flame_particles", true)) {
+                                    if (random.nextInt(3) == 1) spawnFireParticles(currBlock);
+                                }
                             }
                         }
                     }
+
                 }
 
-            }
-
-            // Spread fires periodically (configurable, e.g., every 10 seconds = 200 ticks)
-            fireSpreadTimer++;
-            int spreadInterval = config.getInt("fire_spread_interval_ticks", 200); // Configurable in config.yml
-            if (fireSpreadTimer >= spreadInterval) {
-                fireSpreadTimer = 0;
-                spreadFires(mission);
+                fireSpreadTimer++;
+                int spreadInterval = config.getInt("fire_spread_interval_ticks", 3);
+                if (fireSpreadTimer >= spreadInterval) {
+                    fireSpreadTimer = 0;
+                    spreadFires(mission);
+                }
             }
         }
 
@@ -181,10 +182,10 @@ public class MissionsHandler extends BukkitRunnable {
         Bukkit.getWorld(mission.getWorldName()).setGameRule(GameRule.DO_FIRE_TICK, false); // Prevent natural spread/extinguish
         // Starting fire
         int y = mission.getAltitude();
-        int x1 = mission.getFirstX();
-        int z1 = mission.getFirstZ();
-        int x2 = mission.getSecondX();
-        int z2 = mission.getSecondZ();
+        int x1 = mission.getRegion().getPoint1().getBlockX();
+        int z1 = mission.getRegion().getPoint1().getBlockZ();
+        int x2 = mission.getRegion().getPoint2().getBlockX();
+        int z2 = mission.getRegion().getPoint2().getBlockZ();
         for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++)
             for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
                 Location currLocation = new Location(world, x, y, z);
@@ -214,18 +215,19 @@ public class MissionsHandler extends BukkitRunnable {
         World world = Bukkit.getWorld(mission.getWorldName());
         if (world == null) return;
 
-        int spreadCount = config.getInt("fire_spread_count_per_interval", 5); // Configurable: how many new fires to add
+        int spreadCount = config.getInt("fire_spread_count_per_interval", 15); // Configurable: how many new fires to add
         int y = mission.getAltitude();
-        int minX = Math.min(mission.getFirstX(), mission.getSecondX());
-        int maxX = Math.max(mission.getFirstX(), mission.getSecondX());
-        int minZ = Math.min(mission.getFirstZ(), mission.getSecondZ());
-        int maxZ = Math.max(mission.getFirstZ(), mission.getSecondZ());
-        int minY = Math.min(mission.getFirstZ(), mission.getSecondZ());
-        int maxY = Math.max(mission.getFirstZ(), mission.getSecondZ());
+        int minX = mission.getRegion().getMinX();
+        int maxX = mission.getRegion().getMaxX();
+        int minZ = mission.getRegion().getMinZ();
+        int maxZ = mission.getRegion().getMaxZ();
+        int minY = mission.getRegion().getMinY();
+        int maxY = mission.getRegion().getMaxY();
 
         for (int i = 0; i < spreadCount; i++) {
             int x = minX + random.nextInt(maxX - minX + 1);
             int z = minZ + random.nextInt(maxZ - minZ + 1);
+            int yr = minY + random.nextInt(maxY - minY + 1);
             Location currLocation = new Location(world, x, y, z);
             int n = 0;
             while (!currLocation.getBlock().getType().equals(Material.AIR)) {
@@ -239,10 +241,7 @@ public class MissionsHandler extends BukkitRunnable {
 
             currLocation.add(0, 1, 0);
 
-            if (currLocation.getBlockX() >= minX && currLocation.getBlockX() <= maxX &&
-                    currLocation.getBlockZ() >= minZ && currLocation.getBlockZ() <= maxZ &&
-                    currLocation.getBlockY() >= minY && currLocation.getBlockY() <= maxY) continue;
-
+            if (!mission.getRegion().contains(currLocation)) continue;
 
             Block currBlock = currLocation.getBlock();
             if (currBlock.getType() != fire) {
@@ -259,7 +258,6 @@ public class MissionsHandler extends BukkitRunnable {
                 continue;
             }
             currBlock.setType(fire);
-            // Add smoke particles like campfire
             currBlock.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, currBlock.getLocation().add(0.5, 1, 0.5), 1, 0.2, 0.5, 0.2, 0.01);
         }
     }

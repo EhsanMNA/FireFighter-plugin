@@ -35,10 +35,10 @@ public class FireAreaEffects extends BukkitRunnable {
         Mission mission = MissionManager.getMission(plugin.missionName);
         if (mission == null) return;
 
-        int minX = Math.min(mission.getFirstX(), mission.getSecondX());
-        int maxX = Math.max(mission.getFirstX(), mission.getSecondX());
-        int minZ = Math.min(mission.getFirstZ(), mission.getSecondZ());
-        int maxZ = Math.max(mission.getFirstZ(), mission.getSecondZ());
+        int minX = mission.getRegion().getMinX();
+        int maxX = mission.getRegion().getMaxX();
+        int minZ = mission.getRegion().getMinZ();
+        int maxZ = mission.getRegion().getMaxZ();
         int y = mission.getAltitude();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -53,12 +53,15 @@ public class FireAreaEffects extends BukkitRunnable {
                 if (FireFighter.helmet.isFireHelmet(item)) continue;
             }
 
-            if (inArea && !affectedPlayers.contains(player.getUniqueId())) {
-                applyEffects(player);
-                affectedPlayers.add(player.getUniqueId());
-            } else if (!inArea && affectedPlayers.contains(player.getUniqueId())) {
-                affectedPlayers.remove(player.getUniqueId()); // Allow reapplication if they re-enter
-            }
+//            if (inArea && !affectedPlayers.contains(player.getUniqueId())) {
+//                applyEffects(player);
+//                affectedPlayers.add(player.getUniqueId());
+//            } else if (!inArea && affectedPlayers.contains(player.getUniqueId())) {
+//                affectedPlayers.remove(player.getUniqueId()); // Allow reapplication if they re-enter
+//            }
+
+            if (inArea) applyEffects(player);
+
         }
     }
 

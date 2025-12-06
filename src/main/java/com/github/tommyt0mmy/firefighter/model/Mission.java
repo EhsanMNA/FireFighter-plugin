@@ -7,12 +7,7 @@ public class Mission {
     String worldName;
     int altitude;
 
-    int firstX;
-    int secondX;
-    int firstZ;
-    int secondZ;
-    int firstY;
-    int secondY;
+    Region region;
 
     public Mission(String id) {
         this.id = id;
@@ -50,51 +45,11 @@ public class Mission {
         this.altitude = altitude;
     }
 
-    public int getFirstX() {
-        return firstX;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setFirstX(int firstX) {
-        this.firstX = firstX;
-    }
-
-    public int getSecondX() {
-        return secondX;
-    }
-
-    public void setSecondX(int secondX) {
-        this.secondX = secondX;
-    }
-
-    public int getFirstZ() {
-        return firstZ;
-    }
-
-    public void setFirstZ(int firstZ) {
-        this.firstZ = firstZ;
-    }
-
-    public int getSecondZ() {
-        return secondZ;
-    }
-
-    public void setSecondZ(int secondZ) {
-        this.secondZ = secondZ;
-    }
-
-    public int getFirstY() {
-        return firstY;
-    }
-
-    public void setFirstY(int firstY) {
-        this.firstY = firstY;
-    }
-
-    public int getSecondY() {
-        return secondY;
-    }
-
-    public void setSecondY(int secondY) {
-        this.secondY = secondY;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 }
